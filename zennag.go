@@ -3,10 +3,9 @@ package main
 import (
     "fmt"
     "net/http"
-    //"io/ioutil"
 )
 
-func worker(w int, jobs chan string, answers chan string) {
+func worker(w int, jobs<-chan string, answers chan<- string) {
     for j := range jobs {
         resp, err := http.Get(j)
         if err != nil {
@@ -23,19 +22,17 @@ func worker(w int, jobs chan string, answers chan string) {
 func main() {
     workerPoolSize := 3;
 
-    var urls [3]string
-    urls[0] = "https://beget.ru"
-    urls[1] = "http://habrahabr.ru"
-    urls[2] = "https://google.ru"
+    config := ParseConfig()
+    urls := config.Urls
 
-    jobs := make(chan string)
-    answers := make(chan string)
+    jobs := make(chan string, 100)
+    answers := make(chan string, 100)
 
     for w := 1; w <= workerPoolSize; w++ {
         go worker(w, jobs, answers)
     }
 
-    for i := 1; i <= len(urls); i++ {
+    for i := 0; i < len(urls); i++ {
         jobs <- urls[i]
     }
 
