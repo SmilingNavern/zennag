@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "net/http"
+    "time"
 )
 
 func worker(w int, jobs<-chan string, answers chan<- string) {
@@ -10,11 +11,10 @@ func worker(w int, jobs<-chan string, answers chan<- string) {
         resp, err := http.Get(j)
         if err != nil {
             fmt.Println(err)
+            continue
         }
 
         defer resp.Body.Close()
-        //body, _ := ioutil.ReadAll(resp.Body)
-
         answers <- fmt.Sprintf("%s: %s\n", j, resp.Status)
     }
 }
@@ -32,13 +32,18 @@ func main() {
         go worker(w, jobs, answers)
     }
 
-    for i := 0; i < len(urls); i++ {
-        jobs <- urls[i]
+    for {
+        for i := 0; i < len(urls); i++ {
+            jobs <- urls[i]
+        }
+
+        for a := 1; a <= len(urls); a++ {
+            fmt.Println(<-answers)
+        }
+
+        time.Sleep(30 * time.Second)
     }
 
     close(jobs)
 
-    for a := 1; a <= len(urls); a++ {
-        fmt.Println(<-answers)
-    }
 }
