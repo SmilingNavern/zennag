@@ -9,7 +9,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func worker(w int, jobs <-chan string, answers chan<- string, db *bolt.DB) {
+func Worker(jobs <-chan string, answers chan<- string, db *bolt.DB) {
 	for j := range jobs {
 		resp, err := http.Get(j)
 		if err != nil {
@@ -48,10 +48,10 @@ func main() {
 	}
 
 	for w := 1; w <= workerPoolSize; w++ {
-		go worker(w, jobs, answers, db)
+		go Worker(jobs, answers, db)
 	}
 
-	for t := 0; t < 3; t++ {
+	for {
 		for i := 0; i < len(urls); i++ {
 			jobs <- urls[i]
 		}
@@ -60,9 +60,10 @@ func main() {
 			fmt.Println(<-answers)
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(30 * time.Second)
 	}
 
 	close(jobs)
+
 	ShowStatus(db)
 }

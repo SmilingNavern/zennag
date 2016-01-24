@@ -26,7 +26,6 @@ func SaveStatus(db *bolt.DB, url string, data string) error {
 			return err
 		}
 
-		fmt.Printf("Status saved for: %s\n", url)
 		return nil
 
 	}); err != nil {
