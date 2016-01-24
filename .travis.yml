@@ -1,3 +1,5 @@
-before_install:
+install:
   - go get github.com/boltdb/bolt
 language: go
+go:
+  - 1.5
