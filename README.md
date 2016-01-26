@@ -14,3 +14,4 @@ Simple HTTP-only monitoring written in golang with bolt database for store stati
   * add alerter(telegram)
   * rewrite workers for WaitGroup
   * add agregation statistic
+  * use cobra for cli(https://github.com/spf13/cobra)
