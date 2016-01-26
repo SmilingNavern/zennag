@@ -1,6 +1,8 @@
 ---
+timeout: 30
 urls:
   - "https://yandex.ru"
   - "http://reps.ru"
   - "https://golang.org"
   - "https://reddit.com"
+  - "https://habrahabr.ru/post/275865/"

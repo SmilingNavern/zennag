@@ -1,11 +1,14 @@
 package main
 
 import (
-	"gopkg.in/yaml.v2"
+    "time"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
+    Timeout time.Duration
 	Urls []string
 }
 

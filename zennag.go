@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -11,18 +12,28 @@ import (
 
 func Worker(jobs <-chan string, answers chan<- string, db *bolt.DB) {
 	for j := range jobs {
+		ts := time.Now()
 		resp, err := http.Get(j)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
+		//get HTTP request time
+		te := time.Now()
+		dur := te.Sub(ts)
 
 		defer resp.Body.Close()
 
-		if err := SaveStatus(db, j, resp.Status); err != nil {
+		u, err := url.Parse(j)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		if err := SaveStatus(db, u, resp, dur); err != nil {
 			fmt.Println(err)
 		}
-		answers <- fmt.Sprintf("%s: %s\n", j, resp.Status)
+		answers <- fmt.Sprintf("%s: %s\n", u.Host, resp.Status)
 	}
 }
 
@@ -32,6 +43,7 @@ func main() {
 
 	config := ParseConfig()
 	urls := config.Urls
+    timeout := config.Timeout
 	db := OpenDb()
 
 	defer db.Close()
@@ -41,8 +53,10 @@ func main() {
 
 	// only show stored info in db
 	if len(os.Args) > 1 && os.Args[1] == "-v" {
-		if err := ShowStatus(db); err != nil {
-			fmt.Println(err)
+		for _, u := range urls {
+			if err := ShowStatus(db, u); err != nil {
+				fmt.Println(err)
+			}
 		}
 		os.Exit(0)
 	}
@@ -56,14 +70,16 @@ func main() {
 			jobs <- urls[i]
 		}
 
-		for a := 1; a <= len(urls); a++ {
+		for a := 0; a < len(urls); a++ {
 			fmt.Println(<-answers)
 		}
 
-		time.Sleep(30 * time.Second)
+		time.Sleep(timeout * time.Second)
 	}
 
 	close(jobs)
 
-	ShowStatus(db)
+	for _, u := range urls {
+		ShowStatus(db, u)
+	}
 }
