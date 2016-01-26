@@ -2,9 +2,15 @@
 
 # zennag
 
-Simple HTTP-only monitoring with bolt database for store statistic.
+Simple HTTP-only monitoring written in golang with bolt database for store statistic.
 
 ## features
   * Simple monitoring almost without configuration
   * One yaml config
-  * Simple database, you don't need to configure any settings
+  * Bolt key/value database which requires no configuration at all
+  * Static builded binary with no dependecies(thanks golang)
+
+## todo
+  * add alerter(telegram)
+  * rewrite workers for WaitGroup
+  * add agregation statistic
