@@ -1,15 +1,15 @@
 package main
 
 import (
-    "time"
 	"io/ioutil"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-    Timeout time.Duration
-	Urls []string
+	Timeout time.Duration
+	Urls    []string
 }
 
 func ParseConfig() Config {

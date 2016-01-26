@@ -17,10 +17,10 @@ type StatRecord struct {
 }
 
 func (sr StatRecord) String() string {
-    return fmt.Sprintf("%s %d %f",
-                    sr.Uri,
-                    sr.Rstatus,
-                    sr.Rtime.Seconds())
+	return fmt.Sprintf("%s %d %f",
+		sr.Uri,
+		sr.Rstatus,
+		sr.Rtime.Seconds())
 }
 
 func OpenDb() *bolt.DB {
@@ -39,13 +39,13 @@ func SaveStatus(db *bolt.DB, u *url.URL, resp *http.Response, d time.Duration) e
 			return err
 		}
 
-        // dirty hack for /
-        var uPath string
-        if u.Path == "" {
-            uPath = "/"
-        } else {
-            uPath = u.Path
-        }
+		// dirty hack for /
+		var uPath string
+		if u.Path == "" {
+			uPath = "/"
+		} else {
+			uPath = u.Path
+		}
 		sr := &StatRecord{uPath, resp.StatusCode, d}
 		data, err := json.Marshal(sr)
 		if err != nil {
@@ -76,20 +76,20 @@ func ShowStatus(db *bolt.DB, u string) error {
 		return err
 	}
 
-    fmt.Printf("Host %s status:\n", ur.Host)
+	fmt.Printf("Host %s status:\n", ur.Host)
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(ur.Host))
-        c := b.Cursor()
-        for k, v := c.First(); k != nil; k, v = c.Next() {
-            var sr StatRecord
-            err := json.Unmarshal(v, &sr)
-            if err != nil {
-                fmt.Println(err)
-                c.Next()
-            }
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var sr StatRecord
+			err := json.Unmarshal(v, &sr)
+			if err != nil {
+				fmt.Println(err)
+				c.Next()
+			}
 			fmt.Printf("%s => %s\n", k, sr)
 		}
-        fmt.Printf("\n\n")
+		fmt.Printf("\n\n")
 		return nil
 	})
 	return nil

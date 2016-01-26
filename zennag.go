@@ -43,7 +43,7 @@ func main() {
 
 	config := ParseConfig()
 	urls := config.Urls
-    timeout := config.Timeout
+	timeout := config.Timeout
 	db := OpenDb()
 
 	defer db.Close()
