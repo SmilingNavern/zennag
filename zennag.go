@@ -10,7 +10,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func Worker(jobs <-chan string, db *bolt.DB) {
+func Worker(jobs <-chan string, alerts chan<- string, db *bolt.DB) {
 	for j := range jobs {
 		ts := time.Now()
 		resp, err := http.Get(j)
@@ -18,6 +18,12 @@ func Worker(jobs <-chan string, db *bolt.DB) {
 			fmt.Println(err)
 			continue
 		}
+
+        // 4xx or 5xx status code
+        if resp.StatusCode  > 400 {
+            alerts <- j
+        }
+
 		//get HTTP request time
 		te := time.Now()
 		dur := te.Sub(ts)
@@ -48,6 +54,7 @@ func main() {
 	defer db.Close()
 
 	jobs := make(chan string, 100)
+    alerts := make(chan string, 100)
 
 	// only show stored info in db
 	if len(os.Args) > 1 && os.Args[1] == "-v" {
@@ -60,8 +67,10 @@ func main() {
 	}
 
 	for w := 1; w <= workerPoolSize; w++ {
-		go Worker(jobs, db)
+		go Worker(jobs, alerts, db)
 	}
+
+    go AlertWorker(alerts, db)
 
 	for {
 		for i := 0; i < len(urls); i++ {

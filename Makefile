@@ -1,5 +1,5 @@
 all:
-	go build -o build/zennag config.go db.go zennag.go
+	go build -o build/zennag config.go db.go alerter.go zennag.go
 
 .PHONY: format
 

@@ -52,9 +52,8 @@ func SaveStatus(db *bolt.DB, u *url.URL, resp *http.Response, d time.Duration) e
 			return err
 		}
 
-		timeFormat := "2006-01-02 15:04:05"
 		cur := time.Now()
-		t := cur.Format(timeFormat)
+		t := cur.Format(time.RFC3339)
 
 		if err := b.Put([]byte(t), data); err != nil {
 			return err
@@ -87,6 +86,7 @@ func ShowStatus(db *bolt.DB, u string) error {
 				fmt.Println(err)
 				c.Next()
 			}
+
 			fmt.Printf("%s => %s\n", k, sr)
 		}
 		fmt.Printf("\n\n")
