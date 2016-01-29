@@ -15,3 +15,5 @@ Simple HTTP-only monitoring written in golang with bolt database for store stati
   * rewrite workers for WaitGroup
   * add agregation statistic
   * use cobra for cli(https://github.com/spf13/cobra)
+  * add logging for errors
+  * add flap prevention and alerts for recovery :(
