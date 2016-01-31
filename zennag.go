@@ -19,11 +19,6 @@ func Worker(jobs <-chan string, alerts chan<- string, db *bolt.DB) {
 			continue
 		}
 
-		// 4xx or 5xx status code
-		if resp.StatusCode > 400 {
-			alerts <- j
-		}
-
 		//get HTTP request time
 		te := time.Now()
 		dur := te.Sub(ts)
@@ -50,6 +45,11 @@ func main() {
 	urls := config.Urls
 	timeout := config.Timeout
 	db := OpenDb()
+    err := PrepareDb(db, urls)
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
 
 	defer db.Close()
 
@@ -75,6 +75,7 @@ func main() {
 	for {
 		for i := 0; i < len(urls); i++ {
 			jobs <- urls[i]
+            fmt.Printf("%s", urls[i])
 		}
 
 		time.Sleep(timeout * time.Second)

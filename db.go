@@ -32,6 +32,30 @@ func OpenDb() *bolt.DB {
 	return db
 }
 
+func PrepareDb(db *bolt.DB, urls []string) error {
+	if err := db.Update(func(tx *bolt.Tx) error {
+        for _, u := range urls {
+            r, err := url.Parse(u)
+            if err != nil {
+                //TODO: add logging
+                continue
+            }
+            domain := r.Host
+
+            if _, err := tx.CreateBucketIfNotExists([]byte(domain)); err != nil {
+                fmt.Println(err)
+			    return err
+		    }
+        }
+        return nil
+    }); err != nil {
+        fmt.Println(err)
+        return err
+    }
+
+    return nil
+}
+
 func SaveStatus(db *bolt.DB, u *url.URL, resp *http.Response, d time.Duration) error {
 	if err := db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte(u.Host))
@@ -65,6 +89,7 @@ func SaveStatus(db *bolt.DB, u *url.URL, resp *http.Response, d time.Duration) e
 		return err
 	}
 
+    fmt.Println("Saved status for: %s\n", u.Host)
 	return nil
 
 }
