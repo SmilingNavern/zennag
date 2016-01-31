@@ -70,7 +70,7 @@ func main() {
 		go Worker(jobs, alerts, db)
 	}
 
-	go AlertWorker(alerts, db)
+	go AlertWorker(urls, db)
 
 	for {
 		for i := 0; i < len(urls); i++ {

@@ -10,21 +10,36 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func AlertWorker(alerts <-chan string, db *bolt.DB) {
-	for u := range alerts {
-		required, err := IsAlertRequired(u, db)
-		if err != nil {
-			//TODO: add logging here
-			continue
-		}
+func AlertWorker(urls []string, db *bolt.DB) {
+    alerts := make(map[string]int)
 
-		if required {
-			fmt.Printf("Imitating alert for %s", u)
-		}
+	for {
+        for _, u := range urls {
+		    status, err := IsOkUrl(u, db)
+		    if err != nil {
+			    //TODO: add logging here
+			    continue
+		    }
+
+            alert_for_url := alerts[u]
+
+		    if !status && alert_for_url == 0{
+		        fmt.Printf("Imitating alert for %s\n", u)
+                alerts[u] = 1
+		    } else if status && alert_for_url > 0 {
+                fmt.Printf("Imitating recovery for %s\n", u)
+                alerts[u] = 0
+            }
+
+        }
+
+        time.Sleep(30 * time.Second)
 	}
 }
 
-func IsAlertRequired(u string, db *bolt.DB) (bool, error) {
+// Check last m minutes for url in database
+// return true if StatusCode < 400 for m time
+func IsOkUrl(u string, db *bolt.DB) (bool, error) {
 	r, err := url.Parse(u)
 	if err != nil {
 		return false, err
@@ -59,9 +74,10 @@ func IsAlertRequired(u string, db *bolt.DB) (bool, error) {
 		return nil
 	})
 
-	if count-fail_count > 1 {
-		return true, nil
+    // at least two checks
+	if count > 2 && count - fail_count <= 1 {
+		return false, nil
 	}
 
-	return false, nil
+	return true, nil
 }
