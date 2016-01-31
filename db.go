@@ -89,7 +89,6 @@ func SaveStatus(db *bolt.DB, u *url.URL, resp *http.Response, d time.Duration) e
 		return err
 	}
 
-    fmt.Println("Saved status for: %s\n", u.Host)
 	return nil
 
 }

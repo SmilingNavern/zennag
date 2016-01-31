@@ -75,7 +75,6 @@ func main() {
 	for {
 		for i := 0; i < len(urls); i++ {
 			jobs <- urls[i]
-            fmt.Printf("%s", urls[i])
 		}
 
 		time.Sleep(timeout * time.Second)
