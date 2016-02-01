@@ -45,11 +45,11 @@ func main() {
 	urls := config.Urls
 	timeout := config.Timeout
 	db := OpenDb()
-    err := PrepareDb(db, urls)
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
+	err := PrepareDb(db, urls)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	defer db.Close()
 

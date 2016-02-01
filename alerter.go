@@ -11,29 +11,29 @@ import (
 )
 
 func AlertWorker(urls []string, db *bolt.DB) {
-    alerts := make(map[string]int)
+	alerts := make(map[string]int)
 
 	for {
-        for _, u := range urls {
-		    status, err := IsOkUrl(u, db)
-		    if err != nil {
-			    //TODO: add logging here
-			    continue
-		    }
+		for _, u := range urls {
+			status, err := IsOkUrl(u, db)
+			if err != nil {
+				//TODO: add logging here
+				continue
+			}
 
-            alert_for_url := alerts[u]
+			alert_for_url := alerts[u]
 
-		    if !status && alert_for_url == 0{
-		        fmt.Printf("Imitating alert for %s\n", u)
-                alerts[u] = 1
-		    } else if status && alert_for_url > 0 {
-                fmt.Printf("Imitating recovery for %s\n", u)
-                alerts[u] = 0
-            }
+			if !status && alert_for_url == 0 {
+				fmt.Printf("Imitating alert for %s\n", u)
+				alerts[u] = 1
+			} else if status && alert_for_url > 0 {
+				fmt.Printf("Imitating recovery for %s\n", u)
+				alerts[u] = 0
+			}
 
-        }
+		}
 
-        time.Sleep(30 * time.Second)
+		time.Sleep(30 * time.Second)
 	}
 }
 
@@ -74,8 +74,8 @@ func IsOkUrl(u string, db *bolt.DB) (bool, error) {
 		return nil
 	})
 
-    // at least two checks
-	if count > 2 && count - fail_count <= 1 {
+	// at least two checks
+	if count > 2 && count-fail_count <= 1 {
 		return false, nil
 	}
 

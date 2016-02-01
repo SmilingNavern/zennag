@@ -1,10 +1,10 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
-    "os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -25,10 +25,10 @@ func ParseConfig() Config {
 		panic("Error reading config.yml")
 	}
 
-    if len(config.Urls) == 0 {
-        fmt.Println("You have no urls defined. Double check config.yml")
-        os.Exit(2)
-    }
+	if len(config.Urls) == 0 {
+		fmt.Println("You have no urls defined. Double check config.yml")
+		os.Exit(2)
+	}
 
 	return config
 }
